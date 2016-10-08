@@ -1,0 +1,9 @@
+﻿@model List<SelectListItem>
+@{   
+    string controlId = ViewBag.ControlId;
+    if (controlId == null){
+        controlId = ViewData["controlId"].ToString();
+    }
+}
+
+@Html.DropDownList(controlId, Model, new { @class = "form-control" })	

@@ -1,0 +1,234 @@
+﻿@model CrawlerWebMVCApp.Models.SearchProduct
+@{
+    ViewBag.Title = "Search";
+}
+
+<h2>Search</h2>
+@using (Html.BeginForm("Search", "Product", FormMethod.Post, new { id = "searchProduct", @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <h4>Find your product bellow</h4>
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(m => m.SearchName, new { @class = "col-md-2 control-label" })
+        <div class="col-md-3">
+            @Html.TextBoxFor(m => m.SearchName, new { @class = "form-control" })
+        </div>
+        @Html.LabelFor(m => m.MinPrice, new { @class = "col-md-2 control-label" })
+        <div class="col-md-1">
+            @Html.TextBoxFor(m => m.MinPrice, new { @class = "form-control" })
+        </div>
+        @Html.LabelFor(m => m.MaxPrice, new { @class = "col-md-2 control-label" })
+        <div class="col-md-1">
+            @Html.TextBoxFor(m => m.MaxPrice, new { @class = "form-control" })
+        </div>
+        <div class="col-md-1">
+            <input type="submit" class="btn btn-default" value="Search" />
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.WebsiteID, new { @class = "col-md-2 control-label" })
+        <div class="col-md-3">
+            @Html.DropDownListFor(m => m.WebsiteID, WebsiteModel.GetWebsiteSelectList(Model.WebsiteID), new { @class = "form-control" })
+        </div>
+        @Html.LabelFor(m => m.CategoryID, new { @class = "col-md-2 control-label" })
+        <div class="col-md-3" id="DDCategoryID">
+           @Html.DropDownListFor(m => m.CategoryID, CategoryModel.GetCategorySelectList(Model.WebsiteID, Model.CategoryID), new { @class = "form-control" })
+        </div>
+
+    </div>
+    <div class="form-group">
+        @if (Model.SearchResult != null && Model.SearchResult.Count > 0)
+        {
+            <table id="tableUserList" class="table table-bordered table-striped" style="margin-top:10px;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Website</th>
+                        <th>Price</th>
+                        <th>UpdateDate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.SearchResult)
+                    {
+                        <tr>
+                            <td>@product.ProductID</td>
+                            <td><img src="@product.PhotoLink" alt="No picture" style="max-height:100px;max-width:100px;"/></td>
+                            <td><a href="@product.Link" target="_blank">@product.Name</a></td>
+                            <td>@product.CategoryName</td>
+                            <td>@product.SiteName</td>
+                            <td><span style="color:#428bca;" onclick="ShowProductChart('@product.ProductID');"  >@product.Price</span></td>
+                            <td>@product.UpdateDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+}
+<div id="productChart" style="display:none;">
+    @{Html.RenderPartial("_ProductChart");}
+</div>
+@section Scripts {	
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#WebsiteID").change(function () {
+                console.log("change event!");
+                UpdateCategorySelectList();
+            });
+
+            $("#productChart").dialog({
+                width: 900,
+                height: 600,
+                modal: true,
+                autoOpen: false,
+                resizable: false,
+                draggable: false,
+                closeText: "hide"
+            });                       
+        });
+
+        function ShowProductChart(productID) {
+            var url = '@Url.Action("ShowProductChart", "Product")';
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    'productID': productID
+                },
+                beforeSend: function () {
+                },
+                success: function (data) {
+                    console.log(data);
+                    $("#productChart").dialog('open');
+                    createChart(data);
+                },
+                error: function (data) { console.log('Eroare in trimiterea datelor catre server. Verificati conexiunea!'); }
+
+            }).done(function (html) {
+            });
+        }
+
+        function UpdateCategorySelectList() {
+            var url = '@Url.Action("UpdateCategorySelectList", "Product")';
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    'websiteId': $("#WebsiteID").val(),
+                    'controlId': 'CategoryID'
+                },
+                beforeSend: function () {
+                },
+                success: function (data) {
+                    $('#DDCategoryID').html(data);
+                },
+                error: function (data) { console.log('Eroare in trimiterea datelor catre server. Verificati conexiunea!'); }
+
+            }).done(function (html) {
+            });
+        }
+
+
+        function createChart(productData) {
+            $("#chartMinValue").html("MinPrice:" + productData.minValue + "(" + productData.minDate + ")");
+            $("#chartMaxValue").html("MaxPrice:" + productData.maxValue + "(" + productData.maxDate + ")");
+            var chart = AmCharts.makeChart("chartdiv", {
+                "type": "serial",
+                "theme": "none",
+                "marginRight": 40,
+                "marginLeft": 40,
+                "autoMarginOffset": 20,
+                "mouseWheelZoomEnabled": true,
+                "dataDateFormat": "YYYY-MM-DD",
+                "valueAxes": [{
+                    "id": "v1",
+                    "axisAlpha": 0,
+                    "position": "left",
+                    "ignoreAxisWidth": true
+                }],
+                "balloon": {
+                    "borderThickness": 1,
+                    "shadowAlpha": 0
+                },
+                "graphs": [{
+                    "id": "g1",
+                    "balloon": {
+                        "drop": true,
+                        "adjustBorderColor": false,
+                        "color": "#ffffff"
+                    },
+                    "bullet": "round",
+                    "bulletBorderAlpha": 1,
+                    "bulletColor": "#FFFFFF",
+                    "bulletSize": 5,
+                    "hideBulletsCount": 50,
+                    "lineThickness": 2,
+                    "title": "red line",
+                    "useLineColorForBulletBorder": true,
+                    "valueField": "value",
+                    "balloonText": "<span style='font-size:18px;'>[[value]]</span>"
+                }],
+                "chartScrollbar": {
+                    "graph": "g1",
+                    "oppositeAxis": false,
+                    "offset": 30,
+                    "scrollbarHeight": 80,
+                    "backgroundAlpha": 0,
+                    "selectedBackgroundAlpha": 0.1,
+                    "selectedBackgroundColor": "#888888",
+                    "graphFillAlpha": 0,
+                    "graphLineAlpha": 0.5,
+                    "selectedGraphFillAlpha": 0,
+                    "selectedGraphLineAlpha": 1,
+                    "autoGridCount": true,
+                    "color": "#AAAAAA"
+                },
+                "chartCursor": {
+                    "pan": true,
+                    "valueLineEnabled": true,
+                    "valueLineBalloonEnabled": true,
+                    "cursorAlpha": 1,
+                    "cursorColor": "#258cbb",
+                    "limitToGraph": "g1",
+                    "valueLineAlpha": 0.2,
+                    "valueZoomable": true
+                },
+                "valueScrollbar": {
+                    "oppositeAxis": false,
+                    "offset": 50,
+                    "scrollbarHeight": 10
+                },
+                "categoryField": "date",
+                "categoryAxis": {
+                    "parseDates": true,
+                    "dashLength": 1,
+                    "minorGridEnabled": true
+                },
+                "export": {
+                    "enabled": true
+                },
+                "dataProvider": productData.chartItems
+            });
+
+            chart.addListener("rendered", zoomChart);
+
+            zoomChart(chart);
+        }
+
+
+        function zoomChart(chart) {
+            if (chart.type == "rendered")
+                chart = chart.chart;
+            chart.zoomToIndexes(chart.dataProvider.length - 20, chart.dataProvider.length - 1);
+        }
+</script>
+
+}
+ 

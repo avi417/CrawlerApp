@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="WebscrapEntity.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="500" />
+          <Property Name="link" Type="nvarchar" MaxLength="1000" />
+          <Property Name="idSite" Type="int" />
+          <Property Name="active" Type="bit" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idCategory" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="1000" />
+          <Property Name="title" Type="nvarchar" MaxLength="1000" />
+          <Property Name="link" Type="nvarchar" MaxLength="1000" />
+          <Property Name="price" Type="float" />
+          <Property Name="insertDate" Type="datetime" />
+          <Property Name="updateDate" Type="datetime" />
+          <Property Name="active" Type="bit" />
+          <Property Name="siteId" Type="nvarchar" MaxLength="100" />
+          <Property Name="photoLink" Type="nvarchar" MaxLength="1000" />
+        </EntityType>
+        <EntityType Name="ProductScan">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idProduct" Type="int" />
+          <Property Name="price" Type="float" />
+          <Property Name="date" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ScanHistory">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="command" Type="nvarchar" MaxLength="2000" />
+          <Property Name="idCategory" Type="int" />
+          <Property Name="step" Type="nvarchar" MaxLength="100" />
+          <Property Name="status" Type="int" />
+          <Property Name="statusText" Type="nvarchar" MaxLength="500" />
+          <Property Name="insertDate" Type="datetime" />
+          <Property Name="updateDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Site">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="500" />
+          <Property Name="link" Type="nvarchar" MaxLength="1000" />
+          <Property Name="active" Type="bit" />
+          <Property Name="color" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK_Category_Product">
+          <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="idCategory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_ScanHistory">
+          <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+          <End Role="ScanHistory" Type="Self.ScanHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ScanHistory">
+              <PropertyRef Name="idCategory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_ProductScan">
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+          <End Role="ProductScan" Type="Self.ProductScan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ProductScan">
+              <PropertyRef Name="idProduct" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Site_Category">
+          <End Role="Site" Type="Self.Site" Multiplicity="0..1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="idSite" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="WebscrapEntityStoreContainer">
+          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProductScan" EntityType="Self.ProductScan" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ScanHistory" EntityType="Self.ScanHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Site" EntityType="Self.Site" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Category_Product" Association="Self.FK_Category_Product">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Product" EntitySet="Product" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_ScanHistory" Association="Self.FK_Category_ScanHistory">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="ScanHistory" EntitySet="ScanHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_ProductScan" Association="Self.FK_Product_ProductScan">
+            <End Role="Product" EntitySet="Product" />
+            <End Role="ProductScan" EntitySet="ProductScan" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Site_Category" Association="Self.FK_Site_Category">
+            <End Role="Site" EntitySet="Site" />
+            <End Role="Category" EntitySet="Category" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="WebscrapEntity" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="link" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="idSite" Type="Int32" />
+          <Property Name="active" Type="Boolean" />
+          <NavigationProperty Name="Products" Relationship="Self.FK_Category_Product" FromRole="Category" ToRole="Product" />
+          <NavigationProperty Name="ScanHistories" Relationship="Self.FK_Category_ScanHistory" FromRole="Category" ToRole="ScanHistory" />
+          <NavigationProperty Name="Site" Relationship="Self.FK_Site_Category" FromRole="Category" ToRole="Site" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idCategory" Type="Int32" />
+          <Property Name="name" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="title" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="link" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="price" Type="Double" />
+          <Property Name="insertDate" Type="DateTime" Precision="3" />
+          <Property Name="updateDate" Type="DateTime" Precision="3" />
+          <Property Name="active" Type="Boolean" />
+          <Property Name="siteId" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Category" Relationship="Self.FK_Category_Product" FromRole="Product" ToRole="Category" />
+          <NavigationProperty Name="ProductScans" Relationship="Self.FK_Product_ProductScan" FromRole="Product" ToRole="ProductScan" />
+          <Property Name="photoLink" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="ProductScan">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idProduct" Type="Int32" />
+          <Property Name="price" Type="Double" />
+          <Property Name="date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Product" Relationship="Self.FK_Product_ProductScan" FromRole="ProductScan" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="ScanHistory">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="command" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Name="idCategory" Type="Int32" />
+          <Property Name="step" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="statusText" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="insertDate" Type="DateTime" Precision="3" />
+          <Property Name="updateDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Category" Relationship="Self.FK_Category_ScanHistory" FromRole="ScanHistory" ToRole="Category" />
+        </EntityType>
+        <EntityType Name="Site">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="link" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="active" Type="Boolean" />
+          <Property Name="color" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Categories" Relationship="Self.FK_Site_Category" FromRole="Site" ToRole="Category" />
+        </EntityType>
+        <Association Name="FK_Category_Product">
+          <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+          <End Role="Product" Type="Self.Product" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Product">
+              <PropertyRef Name="idCategory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Category_ScanHistory">
+          <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+          <End Role="ScanHistory" Type="Self.ScanHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ScanHistory">
+              <PropertyRef Name="idCategory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Site_Category">
+          <End Role="Site" Type="Self.Site" Multiplicity="0..1" />
+          <End Role="Category" Type="Self.Category" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Category">
+              <PropertyRef Name="idSite" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Product_ProductScan">
+          <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+          <End Role="ProductScan" Type="Self.ProductScan" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Product">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="ProductScan">
+              <PropertyRef Name="idProduct" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="WebscrapEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Categories" EntityType="Self.Category" />
+          <EntitySet Name="Products" EntityType="Self.Product" />
+          <EntitySet Name="ProductScans" EntityType="Self.ProductScan" />
+          <EntitySet Name="ScanHistories" EntityType="Self.ScanHistory" />
+          <EntitySet Name="Sites" EntityType="Self.Site" />
+          <AssociationSet Name="FK_Category_Product" Association="Self.FK_Category_Product">
+            <End Role="Category" EntitySet="Categories" />
+            <End Role="Product" EntitySet="Products" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Category_ScanHistory" Association="Self.FK_Category_ScanHistory">
+            <End Role="Category" EntitySet="Categories" />
+            <End Role="ScanHistory" EntitySet="ScanHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Site_Category" Association="Self.FK_Site_Category">
+            <End Role="Site" EntitySet="Sites" />
+            <End Role="Category" EntitySet="Categories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Product_ProductScan" Association="Self.FK_Product_ProductScan">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="ProductScan" EntitySet="ProductScans" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="WebscrapEntityStoreContainer" CdmEntityContainer="WebscrapEntities">
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="WebscrapEntity.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="link" ColumnName="link" />
+                <ScalarProperty Name="idSite" ColumnName="idSite" />
+                <ScalarProperty Name="active" ColumnName="active" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Products">
+            <EntityTypeMapping TypeName="WebscrapEntity.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="photoLink" ColumnName="photoLink" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="idCategory" ColumnName="idCategory" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="link" ColumnName="link" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="insertDate" ColumnName="insertDate" />
+                <ScalarProperty Name="updateDate" ColumnName="updateDate" />
+                <ScalarProperty Name="active" ColumnName="active" />
+                <ScalarProperty Name="siteId" ColumnName="siteId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProductScans">
+            <EntityTypeMapping TypeName="WebscrapEntity.ProductScan">
+              <MappingFragment StoreEntitySet="ProductScan">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="idProduct" ColumnName="idProduct" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="date" ColumnName="date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ScanHistories">
+            <EntityTypeMapping TypeName="WebscrapEntity.ScanHistory">
+              <MappingFragment StoreEntitySet="ScanHistory">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="command" ColumnName="command" />
+                <ScalarProperty Name="idCategory" ColumnName="idCategory" />
+                <ScalarProperty Name="step" ColumnName="step" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="statusText" ColumnName="statusText" />
+                <ScalarProperty Name="insertDate" ColumnName="insertDate" />
+                <ScalarProperty Name="updateDate" ColumnName="updateDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Sites">
+            <EntityTypeMapping TypeName="WebscrapEntity.Site">
+              <MappingFragment StoreEntitySet="Site">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="link" ColumnName="link" />
+                <ScalarProperty Name="active" ColumnName="active" />
+                <ScalarProperty Name="color" ColumnName="color" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
